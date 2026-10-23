@@ -25,7 +25,11 @@ for parola in ("e contenuti m\nultimediali", "ontenuti m\n"):
 
 # 2) le sezioni ci sono tutte, in ordine
 attese = ["FFmpeg", "Recordly", "Playwright", "GSAP", "Meshy", "Comfy", "AnyMP4", "Pollinations",
-          "accesso delegato", "vicolo cieco"]
+          "accesso delegato", "vicolo cieco",
+          "HyperFrames", "node_modules", "Le skill", "local-first-webapp-stdlib",
+          "connettori", "Canva", "Composio", "Gmail", "MCP",
+          "rrweb", "session replay", "I progetti", "Mio_Esoscheletro_Z", "SSLM Second Brain",
+          "Modello Delega", "AGENT OS", "Creazione Testo Ultimate"]
 for a in attese:
     print("   sezione/tema %-18s %s" % (a, "c'e' ✓" if a.lower() in tutto.lower() else "MANCA"))
 

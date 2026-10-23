@@ -112,8 +112,9 @@ def copertina(canvas, doc):
     canvas.drawString(24 * mm, A - 112 * mm, DICITURA)
     canvas.setFont("Helvetica", 10)
     righe = [
-        "Otto strumenti gratuiti e una tecnica: come far lavorare un agente",
-        "sui propri profili, e come montare tutto con ffmpeg.",
+        "Dieci strumenti gratuiti, una tecnica e i progetti: come far lavorare",
+        "un agente sui propri profili, come montare tutto con ffmpeg,",
+        "e l'indice dei cantieri.",
         "",
         "Con esempi, comandi e gli avvisi su ciò che è gratuito e ciò che non lo è.",
     ]

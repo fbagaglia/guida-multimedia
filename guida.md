@@ -138,11 +138,97 @@ Le due accortezze, entrambe imparate sbagliando:
 
 Playwright si presenta ai siti come **browser automatizzato**, e alcuni servizi — Google in testa — rispondono *«questo browser potrebbe non essere sicuro»* **prima ancora di chiedere le credenziali**. Non è un blocco sulla password: non c'è nessun campo dove digitarla.
 
-La soluzione esiste, ed è il capitolo 8. Qui basti sapere che il problema non è la password.
+La soluzione esiste, ed è il capitolo 11. Qui basti sapere che il problema non è la password.
 
 ---
 
-# 4 · GSAP: animazione per il web e per il video
+---
+
+# 4 · HyperFrames: montare il video da una pagina
+
+Qui si chiude il cerchio fra i tre capitoli precedenti. **Playwright** fa muovere il browser e **ffmpeg** registra quello che si vede: ma un video non è solo una registrazione. È una sequenza: un titolo che compare, una scheda che spiega, la registrazione che scorre, la voce che accompagna, la dissolvenza, la chiusura.
+
+**HyperFrames** è il motore che fa questo. Si scrive una **composizione** — un file HTML con dentro gli elementi e la loro linea del tempo — e il motore la trasforma in un video. Non è un programma di montaggio con i pulsanti: è **codice**, e questo è precisamente il suo vantaggio.
+
+È **libero e gratuito** (licenza Apache 2.0) e **gira in locale**: il render avviene sul proprio computer, senza servizi da pagare. Richiede due cose che di solito ci sono già: **Node.js** e **ffmpeg**.
+
+## L'idea: il video è un progetto, non un file
+
+Un video montato a mano è un file: se domani cambia una frase, si riapre il programma e si rifà la modifica a mano. Una composizione no.
+
+> Se il video è **codice**, allora il video si **rigenera**. Cambi il testo, rilanci, e il film esce aggiornato — identico a prima in tutto il resto, senza toccare niente con le mani.
+
+Questa è la proprietà che conta quando i video sono trenta e non uno: non si "aggiustano", si **ricostruiscono**. Ed è la stessa idea di tutto il resto di questa guida — descrivere una procedura una volta, invece di eseguirla ogni volta.
+
+## Come si lavora
+
+Cinque passi, in quest'ordine:
+
+1. **Si scrive la composizione.** Gli elementi (testi, immagini, la registrazione, la voce, la musica) e la linea del tempo: cosa compare quando, per quanto, con quale movimento.
+2. **Si controlla** (`check`): il motore verifica errori, impaginazione e **contrasto** dei colori — cioè se il testo si legge sopra lo sfondo. Un errore di contrasto viene segnalato con il colore suggerito.
+3. **Si guarda.** Non si guarda il video: si chiedono i **fotogrammi** in momenti precisi (`snapshot`). È il modo giusto di lavorare, ed è anche il più veloce: guardare un filmato intero per scoprire che il titolo esce dal bordo è uno spreco.
+4. **Si vede in movimento** (`preview`): si apre l'anteprima nel browser, per controllare il ritmo.
+5. **Si produce il film** (`render`): il video finale, in locale.
+
+## Le trappole, che sono costate tempo
+
+Queste non sono avvertenze di manuale: sono cose che ho scoperto sbagliando, e le scrivo perché chi comincia ci sbatte.
+
+- **Un elemento audio senza identificativo è muto, e non dà nessun errore.** Il video esce, si apre, funziona — e non si sente niente. Va sempre verificato che la voce *ci sia*, ascoltandola, non che il file esista.
+- **Il render è lento, e i tempi non si estrapolano.** Su una macchina senza scheda grafica un test di dieci secondi può richiedere un minuto e mezzo, e uno da cento secondi quasi cinque minuti. Da un test breve **non si può dedurre** quanto impiegherà un video lungo: va misurato.
+- **Le dipendenze si risolvono solo da una cartella chiamata `node_modules`.** Spostare il motore in una cartella con un altro nome lo rompe, e l'errore non lo dice.
+- **Il formato di pubblicazione va deciso all'inizio.** Un video 1920×1080 per una piattaforma didattica e un video verticale per i social sono due composizioni diverse: non si converte l'una nell'altra senza perdere qualcosa.
+
+## Dove si colloca, in una frase
+
+**ffmpeg** è il motore che sa fare tutto ma non decide niente; **Playwright** decide le azioni; **HyperFrames** decide il **racconto** — cosa si vede, quando e per quanto. Insieme coprono l'intera filiera, e nessuno dei tre costa qualcosa.
+
+---
+
+---
+
+# 5 · rrweb: registrare il web, non lo schermo
+
+Fin qui abbiamo registrato **pixel**: ffmpeg riprende quello che si vede sullo schermo, e il risultato è un video. rrweb fa una cosa diversa e sorprendente: **registra la pagina, non l'immagine della pagina**.
+
+Si chiama «record and replay the web», è **libero e gratuito** (licenza MIT) ed è lo strumento su cui è costruita la maggior parte dei sistemi di *session replay* — quelli che mostrano come un visitatore ha usato un sito. Invece di catturare fotogrammi, prende nota di **tutti i cambiamenti della pagina**: il testo che compare, un elemento che si sposta, un menu che si apre, un clic. Poi li **riproduce**, ricostruendo la pagina esattamente come si è evoluta.
+
+## Perché è una cosa diversa
+
+La differenza non è tecnica: è di sostanza, e si vede in quattro conseguenze.
+
+| | registrazione dello schermo (ffmpeg) | rrweb |
+|---|---|---|
+| cosa cattura | i **pixel** | i **cambiamenti della pagina** |
+| dimensione del file | grande (decine di MB) | **piccola** (spesso centinaia di volte meno) |
+| il testo dentro | è un'immagine: **non si può cercare** | è testo vero: **si può cercare e copiare** |
+| risoluzione | quella dello schermo | **indipendente**: si riproduce a qualsiasi dimensione, sempre nitido |
+| cosa non cattura | — | **canvas, video incorporati, animazioni particolari** possono non tornare identici |
+
+Il terzo punto è quello che sorprende chi non l'ha mai visto: un video registrato non si può cercare. Un rrweb sì — perché dentro non c'è un'immagine, c'è **la pagina**.
+
+## Dove serve davvero
+
+- **Documentare un'interfaccia** in modo che resti **interrogabile**: si registra un percorso e poi lo si ripercorre cercando una parola.
+- **Capire cosa è andato storto** per un utente: si riproduce esattamente la sequenza che ha portato al problema, non un racconto.
+- **Assistere qualcuno a distanza** mostrandogli il percorso, senza la registrazione pesante.
+- **Tutorial leggeri**, quando il file deve restare piccolo e la pagina non ha contenuti complicati.
+
+## Perché, in questo progetto, l'ho valutato e non l'ho usato
+
+Questo è il punto onesto, e vale più di una descrizione entusiasta. Quando ho dovuto scegliere come registrare i percorsi di navigazione, ho studiato rrweb e **ho deciso di non installarlo**, per tre motivi concreti:
+
+1. **Playwright registra già.** Lo strumento che guida il browser produce da sé un video della pagina: aggiungere rrweb avrebbe significato due sistemi per fare la stessa cosa.
+2. **Il DOM ricostruito non è garantito identico all'originale.** Font diversi, animazioni, `canvas`, video incorporati: la riproduzione può discostarsi da quello che l'utente ha visto davvero. Per un tutorial che deve mostrare **esattamente** ciò che si vede sullo schermo, è un rischio che non vale la pena correre.
+3. **Avevo già un copione migliore.** Il percorso di visita viene salvato come file leggibile — con tempi, didascalie e selettori — e quel file è **già** la descrizione riproducibile della procedura. Un formato di registrazione in più non aggiungeva niente.
+
+> La lezione, che vale oltre questo caso: uno strumento buono non è uno strumento **da usare**. Prima di aggiungerne uno, la domanda giusta non è "funziona?", ma **"cosa mi dà che non ho già?"**. Se la risposta è "niente di decisivo", la scelta migliore è non installarlo — perché ogni pezzo in più è un pezzo da mantenere.
+
+rrweb resta però la scelta **giusta** in altri casi: quando il file deve essere piccolo, quando serve **cercare** dentro la registrazione, o quando si vuole che la riproduzione sia un documento interattivo e non un filmato. Sapere che esiste, e perché **non** usarlo qui, fa parte della cassetta degli attrezzi.
+
+---
+
+# 6 · GSAP: animazione per il web e per il video
 
 GSAP è una libreria di animazione per il web. Nasce per far muovere elementi dentro una pagina, ma il suo uso più interessante per chi fa video è un altro: **animare una pagina HTML e poi riprenderla come fotogrammi di un video**.
 
@@ -154,7 +240,7 @@ Il vantaggio rispetto a un programma di montaggio è che **tutto è descritto in
 
 ---
 
-# 5 · Meshy: oggetti 3D
+# 7 · Meshy: oggetti 3D
 
 Meshy genera **modelli tridimensionali** a partire da una descrizione testuale o da una fotografia. Si ottiene un oggetto 3D — una sedia, un pianeta, un ingranaggio — che si può girare, inserire in una scena, esportare come file `.glb` o `.obj`.
 
@@ -170,7 +256,7 @@ Tradotto: il piano gratuito va benissimo per imparare e per progetti dove puoi c
 
 ---
 
-# 6 · Comfy.org e ComfyUI: immagini e video generati
+# 8 · Comfy.org e ComfyUI: immagini e video generati
 
 Qui conviene fare subito una distinzione, perché è la fonte di quasi tutti gli equivoci.
 
@@ -194,7 +280,7 @@ Il cloud parte con **cinque esecuzioni gratuite** su schede grafiche vere e un p
 
 ---
 
-# 7 · AnyMP4 / AnyRec: conversione e montaggio
+# 9 · AnyMP4 / AnyRec: conversione e montaggio
 
 Sono programmi con l'interfaccia grafica per convertire video, registrarne lo schermo, scaricare da internet, montare. Fanno il loro lavoro, e a molti risultano più comodi di una riga di comando.
 
@@ -222,7 +308,7 @@ Quando un programma gratuito chiede di pagare, guarda **cosa** ti sta vendendo:
 
 ---
 
-# 8 · Pollinations: contenuti generati via API
+# 10 · Pollinations: contenuti generati via API
 
 Pollinations è un servizio che genera **immagini, testo, audio e video** con un'interfaccia molto semplice: spesso basta un indirizzo web. È la via più diretta per aggiungere un'immagine o una voce a un progetto senza installare nulla.
 
@@ -248,7 +334,7 @@ Il vantaggio è che **la credenziale non passa mai da chi la deve usare**: nessu
 
 ---
 
-# 9 · La tecnica: far entrare un agente nei propri profili
+# 11 · La tecnica: far entrare un agente nei propri profili
 
 Questo è il capitolo per cui vale la pena leggere la guida, perché cambia il modo di lavorare più di qualunque strumento dell'elenco.
 
@@ -302,16 +388,213 @@ Un errore che dice soltanto "non posso" fa perdere tempo a chi lo legge, e fa se
 
 ---
 
+---
+
+# 12 · Le skill: procedure scritte una volta
+
+Fin qui la guida ha parlato di **strumenti**: cose che si installano e si usano. Quest'ultima parte parla di un'altra cosa, che non si scarica e non si paga: il **modo di lavorare**.
+
+Una **skill** è una procedura scritta una volta e riusata sempre. Non è un manuale da leggere dall'inizio: è un foglio di istruzioni che l'agente **carica solo quando serve**, cioè quando il lavoro somiglia a quello descritto. È il motivo per cui lo stesso agente sa fare cose molto diverse — scrivere un articolo, montare un video, pubblicare un sito — senza diventare confuso: non tiene tutto in testa insieme, prende il foglio giusto al momento giusto.
+
+> La differenza con un manuale è tutta qui: un manuale lo leggi **prima**, una skill la legge **l'agente**, e solo se il lavoro la riguarda.
+
+## Le skill che contano, per area
+
+Queste sono le vitali in questa installazione, con il criterio: **quelle che cambiano davvero il risultato**. I nomi sono quelli tecnici, perché sono quelli che servono per usarle.
+
+| Area | Skill | A cosa servono |
+|---|---|---|
+| **Costruire app locali** | `local-first-webapp-stdlib`, `windows-background-services`, `local-web-app-e2e-testing`, `headless-webapp-verification` | la convenzione di casa: nessun framework, `http.server`, configurazione in un file JSON, avvio con un `.bat`, il tasto ❓ Guida dentro l'app |
+| **Video e multimedia** | `narrated-tutorial-video`, `hyperframes-video`, `hyperframes-cli`, `navigazione-registrazione-video`, `accesso-delegato-utente`, `local-transcription`, `avatar-voce-clonata` | dalla registrazione muta al film con voce clonata; e l'accesso ai propri profili **senza dare la password** |
+| **Scrivere e pubblicare** | `crea-articolo-seo-geo`, `crea-articolo-umanesimo-digitale`, `audit-seo-geo-francobagaglia`, `humanizer`, `grounded-citations`, `formal-document-production`, `pdf-book-authoring` | i due siti, l'audit obbligatorio prima di pubblicare, i documenti formali, i PDF impaginati |
+| **Programmare con gli agenti** | `hermes-agent`, `launch-subagent`, `claude-code`, `codex`, `git-worktree`, `tdd`, `systematic-debugging`, `verifying-technical-claims` | delegare il codice a più agenti in parallelo, e **non credere a un referto senza verificarlo** |
+| **Scrivere skill** | `effective-agent-skills`, `writing-for-agents` | come si scrive una skill che funziona: cosa metterci, cosa lasciar fuori |
+| **Conoscenza e studio** | `obsidian`, `second-brain-vault-ingest`, `hermes-wiki`, `deep-research`, `web-verified-search` | il vault, l'ingest dei documenti, la ricerca con fonti verificabili |
+| **Automazione** | `hermes-cron-management`, `hermes-bot-profiles`, `email-inbox-triage`, `moodle` | lavori programmati, bot, posta, i corsi sulla piattaforma |
+| **Sicurezza** | `third-party-package-vetting`, `risky-changes`, `global-agent-guardrails` | prima di installare, prima di pubblicare, prima di un comando pericoloso |
+
+## Le regole che rendono utile una skill
+
+1. **Una skill dice cosa fare, non cosa sapere.** Se non cambia il modo in cui il lavoro viene eseguito, non è una skill: è un appunto.
+2. **Meglio poche e vere che molte e generiche.** Una skill che dice "scrivi bene" non serve a niente; una che dice "EN senza trattini lunghi, audit obbligatorio prima di pubblicare" cambia il risultato.
+3. **Si scrive **dopo** aver sbagliato.** Il valore di una skill sta negli errori che evita — quelli che sono costati tempo. Le trappole trovate nei collaudi valgono più dei consigli generali.
+4. **Si aggiorna quando si scopre qualcosa.** Una skill che resta ferma mentre il lavoro cambia diventa un ostacolo, non un aiuto.
+
+---
+
+# 13 · I connettori: dare le mani all'agente
+
+Saper scrivere non basta: per agire in un servizio esterno — leggere la posta, creare un evento, aprire un progetto — l'agente ha bisogno di un **connettore**.
+
+Il connettore è l'autorizzazione con cui l'agente entra in un servizio **per conto tuo**, e la regola è sempre la stessa, in ogni caso:
+
+> **L'utente autorizza, l'agente non vede mai la password.** Non è una gentilezza: è ciò che rende possibile collegare i propri account a un automatismo senza consegnargli le chiavi di casa.
+
+Molti di questi connettori usano un **protocollo standard** (si chiama MCP), che è il motivo per cui si aggiungono e si tolgono senza cambiare l'agente.
+
+## Quelli disponibili qui
+
+| Ambito | Connettori |
+|---|---|
+| **Posta e calendario** | **Gmail** — e con esso **Google Calendar**: lo stesso connettore crea eventi, non solo legge la posta |
+| **Grafica** | **Canva** — già connesso e attivo |
+| **Documenti e progetti** | Notion, Confluence, Airtable, Linear, Jira, Asana, ClickUp, Box |
+| **Il più ampio: Composio** | collega **oltre 500 servizi**: Google Workspace (Gmail, Fogli, Drive, Calendar), Microsoft (Outlook, Teams), Slack, GitHub, Figma, X, Instagram, TikTok, Meta Ads |
+| **Pagamenti e commercio** | Stripe, Shopify, Coinbase, Plaid, Ramp |
+| **Sviluppo** | Vercel, Sentry, Railway, Cloudflare, Datadog, PostHog, Neon, Supabase |
+| **Vita quotidiana** | Todoist, Calendly, Discord |
+
+In questa installazione sono abilitati **55 connettori**.
+
+## La regola che conta
+
+**Se ne connette uno quando serve, non tutti insieme.** Ogni connettore è un permesso in più, e i permessi si danno uno alla volta, quando il lavoro li richiede. È la stessa logica dell'accesso delegato del capitolo 11: chi ha le credenziali le tiene, chi deve usarle riceve **solo il permesso che gli serve** — e il permesso si può togliere.
+
+---
+
+---
+
+# 14 · I progetti
+
+Questa parte non parla di strumenti ma di **cose costruite**: i repository e i cantieri che stanno su questa macchina. Serve a due scopi — avere un indice di cosa c'è, e capire **come** questi strumenti sono stati usati insieme.
+
+## I tre repository di riferimento
+
+| Repository | Visibilità | Cosa contiene |
+|---|---|---|
+| **guida-multimedia** | **pubblico** | questa guida: il PDF impaginato, il testo sorgente in Markdown, il generatore del PDF e i controlli automatici, più il documento con le fonti verificate |
+| **creazione-video** | privato | il materiale dei due corsi: `chiavi_di_lettura.md` (gli script, la fonte unica), `indice_moduli.json` (i 33 moduli), `IMPIANTO.md` (il verbale delle decisioni). **Solo testo**: i video restano sul PC |
+| **regia-tutorial** | privato | il codice dell'app che monta i video: da una registrazione muta e due testi produce il film con voce clonata, musica e dissolvenze |
+
+## I cantieri: cosa sono, cosa contengono
+
+### 1 · Corso Online Sintetico
+Il corso Moodle **607** dell'Academy SSML — «Aggiornamento all'Intelligenza Artificiale» — in **15 unità da 60 minuti**, ognuna con 20 minuti di testo, 30 di pratica e 10 di verifica. È la versione sintetica, per pubblico ampio, del più grande progetto «Corso Online».
+Contiene il piano e lo stato del corso, i testi delle unità con quiz, slide e fonti, gli script Python che **pubblicano su Moodle** via API, e i video.
+**Tecnologie**: Markdown trasformato in HTML da script Python, pubblicazione REST su Moodle, voce sintetica per i video.
+**Stato**: in produzione e in aggiornamento continuo — i moduli sono online sul corso 607.
+
+### 2 · AI Essential 2 SSML
+L'officina che costruisce **due corsi gemelli** spezzando e riusando il Corso Online Sintetico: i corsi universitari Moodle **579** («AI Essentials: informatica, modelli e applicazioni») e **580** («AI Essentials II: dal chatbot al collaboratore»).
+Contiene il compositore deterministico, le due cartelle dei corsi (11-12 moduli ciascuno, con quiz e slide Marp), gli indici, i rapporti di composizione e i materiali comuni.
+**Tecnologie**: testi Markdown, figure generate da script, slide Marp, quiz nativi Moodle caricati via API.
+**Stato**: **materiale didattico già pubblicato** — entrambi i corsi caricati a ottobre 2026. Non un prototipo.
+
+### 3 · REA
+Non è un progetto mio: è il **clone locale di un progetto open source di terzi** (`morluto/rea`, licenza MIT), con in più un dossier di studio che ho scritto. REA è un server che dà a un agente la capacità di **analizzare software di cui non ha il sorgente** — binari, applicazioni Electron, .NET, Android, firmware — restituendo ogni conclusione **con le prove** e i limiti.
+Contiene il codice TypeScript (oltre 1.200 file), i test, la documentazione tradotta in venti lingue, e il dossier con l'architettura, il catalogo dei comandi e le verifiche fatte davvero su questa macchina.
+**Stato**: installato e funzionante, con prove reali su eseguibili di sistema e su un'app Electron.
+
+### 4 · Deep Dog
+Un piccolo laboratorio attorno a un motore di **ricerca approfondita** di terzi: da una domanda produce un **rapporto con citazioni**, con un supervisore che pianifica, dei sub-agent che cercano e le fonti che vengono validate.
+Il motore non è mio; i file miei sono tre: un lanciatore, un'estensione che aggiunge un motore di ricerca diverso da quelli previsti, e un file per il doppio clic.
+**Stato**: funzionante e già usato — c'è un rapporto reale di 96 KB sull'evoluzione dei mestieri della traduzione.
+
+### 5 · Modello Delega
+Il progetto che spiega e mette in pratica **come si delega una piattaforma a un assistente**: un lavoro che si faceva a mano diventa una frase, l'assistente ricognisce, agisce e **riporta la prova**. Il modello è fatto di sei domande — canale e credenziale, sonda dei permessi, identificativo dell'unità di lavoro, falsi successi, come si verifica, cosa non si disfa.
+Contiene il modello come procedura per l'assistente, l'esempio reale su Moodle (autoconfigurante da chiavetta), le tre forme di squadra di agenti e una guida per docenti in sette capitoli.
+**Stato**: finito e **collaudato dal vivo** — l'esempio Moodle ha prodotto esiti verificati, e la prova su posta elettronica ha insegnato la lezione sui canali che coprono solo una parte del lavoro.
+
+### 6 · Menu App loopback
+Una pagina sola con tre ingressi che apre le applicazioni locali al clic; **se l'app è spenta la avvia** e aspetta che risponda prima di aprire il browser. Serve perché una pagina aperta come file non può lanciare un processo.
+Contiene la configurazione con le tre voci, il server, la pagina con i pallini di stato e i launcher.
+**Tecnologie**: Python di sola libreria standard, in ascolto **solo su indirizzo locale** e che rifiuta richieste non locali.
+**Stato**: funzionante e completo. Non reimplementa i launcher dei progetti: li invoca come farebbe l'utente.
+
+### 7 · SSLM Second Brain
+La piattaforma locale che trasforma PDF e note in **note di studio collegate** dentro un vault Obsidian — una nota centrale con indice e rimandi, più note tematiche — e poi le fa **ripassare a intervalli crescenti**, con quiz valutati dall'AI, interrogazione delle note, pacco di schede per il ripasso e generazione di immagini e video.
+Contiene il backend in Python, l'interfaccia, un vault di 108 note, i 35 capitoli del volume «L'Esoscheletro Cognitivo», le guide per i docenti e gli script di verifica.
+**Tecnologie**: Python con **sole due dipendenze** (per leggere i PDF), interfaccia in JavaScript puro, **nessun database** (lo stato sta nel frontmatter delle note), AI via OpenRouter con due modelli — uno per il testo, uno per audio e video.
+**Stato**: funzionante e **in esecuzione adesso**, versione 3.72. È insieme prodotto in uso e corpus didattico.
+
+### 8 · Mio_Esoscheletro_Z
+Applicazione web per la gestione della conoscenza personale secondo il metodo **PARA** e la piramide **DIKW**: note con metadati, elaborazione AI delle note grezze, chat socratica, grafo della conoscenza, flashcard con ripetizione spaziata, import/export di progetti.
+Contiene circa venti rotte di programmazione, quattordici componenti di dominio (dashboard, piramide, grafo, chat, editor), un vault di 35 note e il grafo.
+**Tecnologie**: **Next.js 16 con TypeScript**, Tailwind, grafo con D3.js, dati su file Markdown, AI tramite un servizio esterno.
+**Stato**: **prototipo sperimentato e superato**, non un'app in uso. Il progetto è stato costruito in un ambiente cloud e poi copiato qui; localmente non è avviabile così com'è. Il suo ruolo è stato quello del **banco di prova**: molte idee sono poi confluite in SSLM Second Brain, che è la versione matura e funzionante.
+
+### 9 · AGENT OS
+Dashboard locale per **censire e pilotare agenti da riga di comando di fornitori diversi**, con il confronto affiancato dello stesso prompt su più agenti e con **terminali veri** dentro la pagina.
+Contiene il server in Python di sola libreria standard, il gestore dei processi, il catalogo degli agenti, la scoperta automatica di quelli installati, una libreria di **50 prove in 16 categorie** e i collaudi automatici.
+**Tecnologie**: Python con una sola dipendenza per i terminali, interfaccia senza framework, funziona **offline**.
+**Stato**: funzionante e collaudato (26 commit).
+
+### 10 · Creazione Testo Ultimate
+Generatore locale di contenuti: articolo (per argomento, rivisitazione o da un link), accompagnamento per i social, domande frequenti, pacchetto per i motori di ricerca, griglie di schede, hashtag per piattaforma, titoli alternativi, traduzione italiano/inglese e «umanizzazione» del testo.
+Due pagine — lo studio e l'officina — con backend in Python di libreria standard che interroga ricerca web e Wikipedia (la ricerca non può stare nel browser, per una restrizione di sicurezza dei browser stessi), e i modelli via OpenRouter.
+**Stato**: **il progetto più avanzato e più attivo** (35 commit, backend alla versione 2.12). Ha assorbito ed esteso il precedente «Crea Post».
+
+### 11 · Hermes Logos
+Piattaforma **local-first** per la gestione della conoscenza, il ripasso spaziato e l'automazione quotidiana, in due aree: un gestore di attività (posta multi-casella, rassegna dal web, diario di apprendimento, notizie, lavori programmati) e l'esoscheletro (second brain su vault Obsidian).
+Contiene il motore in Python (oltre 5.000 righe), la dashboard, l'amministratore dei lavori programmati, il plugin per Obsidian e le guide.
+**Tecnologie**: Python con un framework web, interfaccia in HTML e JavaScript, bot di messaggistica, sincronizzazione **a una via** verso il server remoto (che è vetrina, non seconda fonte).
+**Stato**: **in esercizio quotidiano** (154 commit).
+
+### 12 · Comune Demo Console
+«Mission Control»: una console locale per **coordinare più agenti da un'unica interfaccia** durante il corso per gli impiegati comunali — con tre esecutori diversi collegati insieme.
+Contiene il server, l'interfaccia, il catalogo dei casi d'uso per la pubblica amministrazione (posta certificata, anagrafe, edilizia, intermediazione linguistica), i client separati per ogni esecutore, diciassette profili di agenti e **dati fittizi**.
+**Tecnologie**: Python di libreria standard, interfaccia senza framework, un launcher che classifica chi occupa le porte e termina **solo** i processi del progetto (mai i servizi condivisi con la produzione).
+**Stato**: pronto e **usato in aula** (22 commit).
+
+### 13 · Agenti per tutti
+Kit didattico — documenti, non software — per il corso «2026: l'anno degli agenti»: tre ore per gli impiegati dei Comuni di **Allumiere e Tolfa**, più un modulo universitario su studio e intermediazione linguistica.
+Contiene il manuale operativo di 38 KB, la teoria delle cinque ingegnerie (dal prompt al grafo), quattro casi studio comunali, il piano d'aula minuto per minuto, la parte su governance ed etica nella pubblica amministrazione, una raccolta di 40 istruzioni pronte e i materiali di supporto.
+**Tecnologie**: puro Markdown, con dimostrazioni dal vivo.
+**Stato**: **consegnabile e chiuso** (12 commit). Lo standard di ricerca web verificata nato qui è stato poi adottato dagli altri progetti.
+
+### 14 · Crea Post
+Web app locale che genera contenuti per i social: titolo e corpo del post, abstract, tweet, hashtag, domande frequenti, link suggeriti e versione umanizzata del testo.
+**Tecnologie**: HTML, CSS e JavaScript senza framework, generazione via OpenRouter (migrata da un altro fornitore), cronologia nell'interfaccia.
+**Stato**: **il più vecchio della lista** e non più sviluppato: è proseguito nei due successori, «Creazione Testo Ultimate» e «Crea Post Abacus».
+
+## Gli altri repository
+
+Oltre ai cantieri qui sopra, la cassetta degli attrezzi contiene altri repository, più piccoli o più specialistici:
+
+| Repository | Cosa contiene |
+|---|---|
+| **corso-secondo-cervello-agentico** | il corso online «Il secondo cervello agentico», 15 moduli |
+| **corso-agenti-ssml** · **corso-agenti-sslm** | il corso sugli agenti AI per docenti universitari, nelle due edizioni |
+| **pacchetto-delega** | il pacchetto d'installazione: il Cervello, i bot, il modello di delega |
+| **agent-os** | la dashboard per censire e pilotare agenti (versione condivisa) |
+| **private-skills** | le skill condivise fra i miei agenti, in un'unica cartella canonica |
+| **hermes_logos** | la piattaforma Hermes Logos (versione condivisa) |
+| **anki-bot** | l'agente che prepara le schede di ripasso per il gruppo di studio |
+| **creazione-testo-ultimate** | il generatore di contenuti (versione condivisa) |
+| **menu-app-loopback** | il menu delle applicazioni locali (versione condivisa) |
+| **ssml-second-brain** | la piattaforma di studio (versione condivisa) |
+| **ai-essentials-2-ssml** | l'officina dei due corsi gemelli (versione condivisa) |
+| **nanoclaw-setup** | l'assistente NanoClaw sul server remoto: guida operativa |
+| **comune-demo-console** | la console di coordinamento agenti (versione condivisa) |
+| **agenti-per-tutti** | il kit didattico per gli impiegati comunali (versione condivisa) |
+| **SkillHub** · **dashboard** | raccolta di skill e pannello personale |
+| **tts-italiano-premium** | sintesi vocale in italiano |
+| **formazione** | materiale dell'Accademia Formazione (**pubblico**) |
+| **umanesimodigitale** | il motore di ricerca del sito UmanesimoDigitale.info (**pubblico**) |
+| **francobagaglia** | il sito personale |
+
+## Cosa si vede, guardando l'insieme
+
+Tre cose, che valgono più di un elenco.
+
+**La prima**: quasi tutto è **locale e senza dipendenze pesanti**. La maggior parte dei progetti usa Python di libreria standard e JavaScript senza framework, e **non ha un database** — lo stato sta in file leggibili. È una scelta precisa: significa che un progetto si può riaprire fra due anni e capirlo, senza ricostruire un ambiente.
+
+**La seconda**: i progetti **si sono succeduti**, non moltiplicati. «Crea Post» è diventato «Creazione Testo Ultimate». «Mio_Esoscheletro_Z», costruito in ambiente cloud, è stato il banco di prova da cui è nato «SSLM Second Brain», che è la versione matura e in uso. Questo è il modo giusto di lavorare: il prototipo **serve** a scoprire cosa non funziona, e poi si butta.
+
+**La terza**: c'è un filo che li lega tutti, ed è lo stesso di questa guida — **la procedura scritta una volta**. Il modello di delega, le skill, gli script che pubblicano i corsi, il generatore di questa guida: sono tutti modi diversi di dire la stessa cosa. Non eseguire un lavoro a mano, ma **descriverlo**, perché la volta dopo si esegua da solo.
+
+---
+
 # Come si combinano: una filiera completa
 
 Mettiamo insieme i pezzi, in un caso reale: **un tutorial che mostra come si usa un'applicazione**.
 
 1. **Si decide cosa mostrare.** Una descrizione scritta di quello che il video deve far vedere. È il testo che guiderà tutto il resto.
-2. **L'automatismo entra nel servizio** (capitolo 9): finestra propria, accesso fatto dalla persona, sessione salvata.
+2. **L'automatismo entra nel servizio** (capitolo 11): finestra propria, accesso fatto dalla persona, sessione salvata.
 3. **Si legge l'interfaccia** con Playwright (capitolo 3): quali elementi ci sono, dove sono, cosa dicono.
 4. **Si decide, un passo alla volta, cosa mostrare** — e qui sta l'accorgimento che fa la differenza: non si pianifica tutto in anticipo, perché dopo il primo clic la schermata cambia. Si procede **una tappa alla volta**, rileggendo la pagina dove si è arrivati.
 5. **Si registra con ffmpeg** (capitolo 1), non con lo screencast: così si vede il puntatore vero.
-6. **Si scrivono le didascalie e si genera la voce** (capitolo 8) per ogni tappa.
+6. **Si scrivono le didascalie e si genera la voce** (capitolo 10) per ogni tappa.
 7. **Si monta tutto** con ffmpeg: le dissolvenze fra le scene, la musica di sfondo, l'abbassamento automatico della musica quando la voce parla.
 8. **Si esporta** nel formato di destinazione — 1920×1080 per una piattaforma didattica, verticale per i social.
 
