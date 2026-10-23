@@ -21,6 +21,7 @@ progetti**, con i dati verificati sulle fonti ufficiali. Alla base di tutto c'è
 | 12 | **Le skill** — procedure scritte una volta | — |
 | 13 | **I connettori MCP** — dare le mani all'agente | 55 abilitati |
 | 14 | **I progetti** — i repository e i cantieri, con la spiegazione di ciascuno | — |
+| 15 | **Portare tutto su un altro computer** — cosa salvare e cosa no | — |
 
 ## File
 

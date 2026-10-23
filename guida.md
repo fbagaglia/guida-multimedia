@@ -610,6 +610,16 @@ Questa è la parte utile: **non si è obbligati a portare tutto**. Si sceglie pe
 
 **Il livello 2 è quello che consiglio**: circa **110 MB**, sta in una chiavetta, e riporta tutto quello che conta. Il livello 4 pesa quasi due gigabyte e serve solo se vuoi davvero lo storico integrale: per il resto è zavorra.
 
+> **I 110 MB sono quasi tutti le skill.** Il resto — memoria, configurazione, chiavi, autorizzazioni, lavori programmati — sta in **meno di 3 MB**. Il peso delle skill non è testo: sono le immagini e i file di supporto che alcune si portano dietro.
+
+### C'è anche una cartella da NON portare
+
+Nella cartella dell'installazione ce n'è una che sembra importante e non lo è: si chiama `tools`, pesa **1,8 GB** e contiene i **programmi scaricati** dal sistema per lavorare — il browser per l'automazione, `ffmpeg`, `node`, `python`, `git`, gli strumenti di ricerca nel testo.
+
+**Non va copiata**: sono cose che il sistema **riscarica da solo** sul computer nuovo, la prima volta che servono. Copiarle significherebbe portarsi dietro quasi due gigabyte di file che verrebbero comunque riletti e rigenerati — e che, se il computer nuovo ha una versione diversa di Windows, potrebbero persino non funzionare.
+
+È lo stesso errore in cui si cade con i progetti: **si copia ciò che non si sa ricostruire, non ciò che si sa riscaricare.**
+
 > La voce che quasi tutti dimenticano sono le **autorizzazioni dei connettori**: non stanno nel file di configurazione, ma in una cartella a parte (`mcp-tokens`). Se non la porti, i connettori vanno **riconnessi a mano, uno per uno** — anche avendo copiato tutto il resto.
 
 ## Come si fa, in pratica
