@@ -585,6 +585,57 @@ Tre cose, che valgono più di un elenco.
 
 ---
 
+---
+
+# 15 · Portare tutto su un altro computer
+
+Un'ultima cosa, che non è multimedia ma è la domanda che viene subito dopo: **se cambio computer, cosa mi porto dietro?**
+
+La risposta è più semplice di quanto sembri, perché l'installazione **non è sparsa**: vive in **una sola cartella**.
+
+## Una cartella sola
+
+Tutto sta in `%LOCALAPPDATA%\hermes\` — cioè, su Windows, `C:\Users\<nome>\AppData\Local\hermes\`. Memoria, skill, connettori, lavori programmati, configurazione, credenziali: **tutto lì dentro**. Non ci sono pezzi nascosti altrove.
+
+## Si sceglie quanto portare
+
+Questa è la parte utile: **non si è obbligati a portare tutto**. Si sceglie per livelli, e la differenza è grande.
+
+| Livello | Cosa si aggiunge | Peso | Cosa si ritrova |
+|---|---|---|---|
+| **1** | memoria, configurazione, personalità, credenziali, **autorizzazioni dei connettori**, lavori programmati, plugin | **~1 MB** | chi sei, come lavori, i connettori già autorizzati |
+| **2** | **+ le skill** | **+110 MB** | **l'installazione torna a essere la tua**: senza skill l'agente sa ragionare, con le skill sa *come fai tu le cose* |
+| **3** | + la cronologia delle conversazioni | +75 MB | rileggere le chat passate |
+| **4** | + il database completo | **+1,8 GB** | la memoria storica integrale |
+
+**Il livello 2 è quello che consiglio**: circa **110 MB**, sta in una chiavetta, e riporta tutto quello che conta. Il livello 4 pesa quasi due gigabyte e serve solo se vuoi davvero lo storico integrale: per il resto è zavorra.
+
+> La voce che quasi tutti dimenticano sono le **autorizzazioni dei connettori**: non stanno nel file di configurazione, ma in una cartella a parte (`mcp-tokens`). Se non la porti, i connettori vanno **riconnessi a mano, uno per uno** — anche avendo copiato tutto il resto.
+
+## Come si fa, in pratica
+
+Il backup e il ripristino sono due comandi, e si danno a due file già pronti: uno copia (fermando prima il servizio, ed escludendo cache, registri e temporanei), l'altro ricopia sul computer nuovo.
+
+L'ordine è questo:
+
+1. **Sul computer vecchio**: si lancia il backup, indicando dove salvare (una chiavetta, un disco esterno).
+2. **Sul computer nuovo**: si installa Hermes, **si chiude**, e si lancia il ripristino.
+3. Si riapre: memoria, skill, connettori, lavori programmati e configurazione sono già lì.
+
+## Le tre precauzioni che contano
+
+1. **Il backup contiene segreti** — credenziali e autorizzazioni. Non va su un servizio non cifrato, e la chiavetta va trattata come una chiave di casa: chi la trova, entra.
+2. **Il nome utente cambia.** Dentro la configurazione ci sono percorsi assoluti del tipo `C:\Users\<nome>\...`: vanno aggiornati. È la causa numero uno dei «non funziona niente» dopo un trasferimento, ed è una cosa da fare subito, non da scoprire dopo.
+3. **I file di avvio vanno scritti in formato Windows** (a capo CRLF, caratteri semplici senza accenti): altrimenti il sistema non li esegue, senza spiegare perché.
+
+## Il principio, che è lo stesso di tutta la guida
+
+Vale anche qui la regola che tiene insieme ogni capitolo: **la cosa importante non sono i file, è il modo di lavorare che contengono**.
+
+Portarsi dietro millequattrocento skill non serve perché sono tante, ma perché ognuna è **una procedura che qualcuno ha già faticato a scoprire** — le trappole, le scorciatoie, gli errori da non ripetere. È quello che un'installazione nuova non ha, e che ricostruire a mano costerebbe mesi.
+
+---
+
 # Come si combinano: una filiera completa
 
 Mettiamo insieme i pezzi, in un caso reale: **un tutorial che mostra come si usa un'applicazione**.
