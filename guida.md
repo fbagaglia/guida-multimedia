@@ -659,7 +659,7 @@ Prima di raccontarlo, la differenza che conta — perché è la stessa domanda c
 | Che cos'è | agente completo, con harness proprio | orchestratore di CLI esistenti |
 | Chi pensa | il provider che scegli (OpenRouter) | i CLI che hai già: Claude, Codex, Grok |
 | Interfaccia | app desktop, riga di comando, gateway per i bot | **chat a contatti**: ogni bot è un contatto |
-| Memoria | sua, persistente fra le sessioni | per conversazione, dai CLI sottostanti |
+| Memoria | sua, persistente fra le sessioni | **del singolo bot**, non condivisa fra loro |
 | Skill | **1.428 file**, sue | nessuna propria: quelle dei CLI |
 | Estensione | skill, plugin, connettori MCP | **un file** per aggiungere un fornitore |
 | Permessi | delegati al modello | **broker**: ogni azione rischiosa è una carta *approva/nega* |
@@ -689,12 +689,12 @@ Tutto gira **sulla tua macchina**: il server ascolta su `127.0.0.1` e i dati —
 ## Le tre cose che fa meglio
 
 1. **I permessi.** Ogni azione rischiosa diventa una carta con *approva* e *nega* **dentro la chat**. Non è un'impostazione sepolta: è il modo normale di lavorare. È l'opposto dell'agente che si fida e va avanti.
-2. **I bot si parlano.** Puoi metterne uno come capo e gli altri come specialisti — posta, spese, reclutamento, correzioni — e si scambiano contesto **da soli**, in chat di gruppo, senza che tu faccia da tramite.
+2. **I bot si parlano.** Puoi metterne uno come capo e gli altri come specialisti — posta, spese, reclutamento, correzioni — e si scambiano contesto **da soli**, in chat di gruppo, senza che tu faccia da tramite. **Attenzione a cosa si condivide e cosa no**: in una stanza i bot vedono **la stessa trascrizione** e le **istruzioni condivise**, ma **non hanno una memoria comune**. Ognuno ha la sua — la memoria, il modello e il computer sono **del singolo bot**. Non è un agente con più voci: sono **agenti distinti che si passano il contesto nella stanza**.
 3. **Vedere il lavoro.** Ogni bot può avere un computer con **anteprima dal vivo**: guardi cosa sta facendo mentre lo fa, invece di leggere un riassunto dopo.
 
 ## Le cose che gli mancano, rispetto a Hermes
 
-1. **Non ricorda fra le sessioni.** La memoria è del singolo filo di conversazione. Hermes ha una memoria che sopravvive ai riavvii.
+1. **Non ricorda fra le sessioni — e non ha una memoria comune.** La memoria è **del singolo bot e del suo filo di conversazione**: se un bot impara qualcosa, lo sa **lui**; gli altri no, a meno che non glielo diciate. Hermes ha **una** memoria, che vale in ogni contesto e sopravvive ai riavvii. La prova che lì è locale: quando esporti un team come pacchetto, il file porta i bot, le istruzioni, le skill e le routines — ma **non** credenziali, conversazioni, permessi, **memoria** né accesso al computer.
 2. **Non impara.** Non c'è un posto dove mettere una procedura scoperta una volta. Hermes scrive **skill**.
 3. **È un'app da scrivania.** Non sta su un server come servizio con i suoi bot. Hermes sì.
 
