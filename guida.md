@@ -780,6 +780,56 @@ Quattro esempi, tutti di lavoro vero.
 
 **E cosa *non* gli chiedi.** *«Ricordati che il cliente preferisce le mail brevi»*: non se lo ricorda, non ha memoria fra le sessioni. *«Metti in piedi un servizio che sorvegli una cartella e mi avvisi»*: non lo fa, i comandi sono sincroni e non ci sono lavori programmati. *«Chiedimi il permesso prima di cancellare»*: non chiede, parte e basta. Per queste tre cose serve un altro agente — ed è esattamente il confine con Hermes.
 
+## Come si aumenta l'harness (senza installare un altro programma)
+
+Questa è la parte che sorprende chi arriva da strumenti chiusi. In Pi **non esiste un mercato di estensioni** da cercare: **si chiede a Pi di costruirsi la funzione che serve**. La frase sul sito è letterale — *«Pi non è un prodotto sigillato: se ti serve un comando, uno strumento, un fornitore, un flusso di lavoro o una modifica all'interfaccia, chiedi a Pi di costruirla. Si personalizzerà al volo»*.
+
+Il giro è questo: chiedi la funzione in linguaggio naturale, Pi **scrive il codice dell'estensione**, tu la usi. Se poi vuoi condividerla con altri, diventa un **pacchetto Pi** installabile da npm o da git.
+
+E i modi per aumentarlo sono cinque:
+
+| come | cosa aggiunge |
+|---|---|
+| **Estensioni** | comandi, strumenti, fornitori, flussi, modifiche all'interfaccia |
+| **Skill** | pacchetti di istruzioni e strumenti, **caricati solo quando servono** |
+| **File `AGENTS.md`** | istruzioni di progetto, lette all'avvio dalla tua cartella, da quelle superiori e da `~/.pi/agent/` |
+| **File `SYSTEM.md`** | sostituisce o integra le istruzioni di sistema, **per singolo progetto** |
+| **Modelli e fornitori** | 15 e più fornitori (Anthropic, OpenAI, Google, xAI, Groq, OpenRouter, Ollama…) e i tuoi, via un file o un'estensione |
+
+E poi c'è la **compattazione**, cioè il riassunto dei messaggi vecchi quando il contesto si riempie: in altri strumenti è una scatola nera, qui è **personalizzabile con un'estensione** — puoi far riassumere per argomento, o con un modello diverso, o in modo che capisca il codice.
+
+**In una riga**: l'harness di Pi non è piccolo perché non si può allargare. È piccolo perché **parte da zero e cresce solo dove serve** — e la crescita la scrive l'agente stesso.
+
+## Un esempio concreto di estensione
+
+Il caso più semplice che si fa davvero: **il salvataggio su GitHub in un comando solo**. Invece di digitare a mano la sequenza di comandi per preparare, scrivere il messaggio e pubblicare, chiedi a Pi:
+
+> *«Fammi un comando che prende i file modificati, mi chiede il messaggio di commit e pubblica.»*
+
+Pi scrive l'estensione, la installa, e da quel momento hai un comando tuo — con il suo pezzo di interfaccia se serve. Se ti va, la impacchetti e la condividi; se non ti serve più, la togli.
+
+Altri esempi dello stesso tipo: un comando che apre il browser sulla pagina che stai modificando, un'estensione che aggiunge il tuo fornitore di modelli non previsto, una che cambia il modo in cui vengono riassunti i messaggi lunghi.
+
+## C'è un'interfaccia grafica? Sì, ma non è ufficiale
+
+Qui serve precisione, perché la confusione è facile.
+
+**Pi, di suo, è da terminale.** Il pacchetto ufficiale — `@earendil-works/pi-coding-agent`, degli autori di Pi — è **solo a interfaccia testuale**: non ha un'opzione per mettersi in ascolto su una porta o per servire una pagina web. Se cerchi «Pi» con un'interfaccia grafica, **non la trovi nel pacchetto ufficiale**: la trovi nella comunità.
+
+**L'interfaccia grafica esiste grazie alla comunità**: un pacchetto **`pi-web-ui`** — di un autore diverso dagli autori di Pi, licenza libera, in sviluppo attivo — che avvia una pagina nel browser con:
+
+- chat con risposta che scorre in diretta;
+- **un terminale vero** dentro la pagina;
+- pannello per Git, ricerca, **subagenti**, plugin, temi;
+- funziona anche come **app installabile** dal browser (quelle che si aprono come programmi).
+
+Due cose da sapere prima di usarla:
+
+1. **Riusa la configurazione di Pi.** Stesse credenziali, stessi modelli, stessa cronologia: non devi riconfigurare niente, e quello che fai nel browser lo ritrovi nel terminale.
+2. **Pi non ha un sistema di permessi.** Gli strumenti girano con i privilegi dell'utente che l'ha avviato: se ci metti davanti un browser, stai dando a quel browser **una riga di comando con i tuoi diritti**. È accettabile **solo perché resta in ascolto sul tuo computer** — ed è esattamente per questo che va tenuto su indirizzo locale e non esposto in rete.
+
+E c'è una terza via: Pi ha **quattro modalità** — interattiva, a stampa, **a chiamate remote** e **come libreria**. La modalità a chiamate remote è il motivo per cui esistono interfacce di terzi: si può costruire la propria. È così che è nata quella della comunità, ed è così che **OpenClaw** — un altro strumento che si vede in giro — usa Pi dentro di sé.
+
 ## Quando ha senso, e quando no
 
 **Ha senso** se sai cosa stai facendo: se ti serve un assistente che legga, modifichi ed esegua, senza cerimonie, e vuoi vedere esattamente cosa gli passi. Costa poco in gettoni e non ti obbliga a imparare un sistema.
