@@ -30,7 +30,9 @@ attese = ["FFmpeg", "Recordly", "Playwright", "GSAP", "Meshy", "Comfy", "AnyMP4"
           "connettori", "Canva", "Composio", "Gmail", "MCP",
           "rrweb", "session replay", "I progetti", "Mio_Esoscheletro_Z", "SSLM Second Brain",
           "Modello Delega", "AGENT OS", "Creazione Testo Ultimate",
-          "Portare tutto su un altro computer", "mcp-tokens", "livello 2", "chiavetta"]
+          "Portare tutto su un altro computer", "mcp-tokens", "livello 2", "chiavetta",
+          "OpenMausBot", "orchestrabot", "harness", "Pi", "harness minimale",
+          "Verifica l'aggiornamento", "La fonte ufficiale batte il racconto"]
 for a in attese:
     print("   sezione/tema %-18s %s" % (a, "c'e' ✓" if a.lower() in tutto.lower() else "MANCA"))
 

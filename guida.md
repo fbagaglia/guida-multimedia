@@ -646,6 +646,150 @@ Portarsi dietro millequattrocento skill non serve perché sono tante, ma perché
 
 ---
 
+---
+
+# 16 · OpenMausBot: mettere in fila gli agenti che già paghi
+
+Prima di raccontarlo, la differenza che conta — perché è la stessa domanda che si fa chi usa questa guida.
+
+**Hermes è un agente; OpenMausBot è un orchestrabot.** Hermes porta **il suo** motore, i suoi strumenti, la sua memoria e le sue procedure: con una chiave OpenRouter fa tutto da sé. OpenMausBot **non ha un agente proprio**: prende i programmi da riga di comando che hai già installato — `claude`, `codex`, `grok` — e ti dà una bella interfaccia per parlarci. **Senza uno di quegli abbonamenti, OpenMausBot non fa niente.**
+
+| | **Hermes** | **OpenMausBot** |
+|---|---|---|
+| Che cos'è | agente completo, con harness proprio | orchestratore di CLI esistenti |
+| Chi pensa | il provider che scegli (OpenRouter) | i CLI che hai già: Claude, Codex, Grok |
+| Interfaccia | app desktop, riga di comando, gateway per i bot | **chat a contatti**: ogni bot è un contatto |
+| Memoria | sua, persistente fra le sessioni | per conversazione, dai CLI sottostanti |
+| Skill | **1.428 file**, sue | nessuna propria: quelle dei CLI |
+| Estensione | skill, plugin, connettori MCP | **un file** per aggiungere un fornitore |
+| Permessi | delegati al modello | **broker**: ogni azione rischiosa è una carta *approva/nega* |
+| Computer | la tua macchina (e un server) | cloud Linux, VM locale, o il tuo PC |
+| Costo | la tua chiave OpenRouter | i tuoi abbonamenti a Claude o Codex |
+
+## L'idea
+
+Un'app di messaggistica dove **ogni contatto è un agente**. Non una finestra di chat sola: una colonna di bot, ognuno con il suo filo, la sua memoria, il suo modello, il suo computer e le sue app collegate. Passi da un bot all'altro come passi da una conversazione all'altra in un'app di messaggi.
+
+È nato come **alternativa libera** a prodotti chiusi dello stesso tipo — Grok Bot di xAI, Muse, dots, Cue — ed è **open source** (licenza Apache-2.0), scritto in TypeScript. Non è affiliato a nessuno di quei produttori: il nome lo dichiara apertamente.
+
+## Come è fatto dentro: due processi
+
+È la parte che vale la pena capire, perché spiega tutto il resto.
+
+**Il primo processo è l'app.** È volutamente **stupida**: non gestisce da sé nessun collegamento ai CLI, non conserva stato, non parla con nessun servizio esterno. Manda comandi con una richiesta web e ascolta **un solo flusso continuo di aggiornamenti** che torna indietro. Tutto quello che vedi sullo schermo — un messaggio che compare, uno strumento che viene usato — passa da quel flusso unico.
+
+**Il secondo processo è il server del harness**, e fa tre mestieri:
+
+1. **Il registro dei piloti.** Un *pilota* per ogni fornitore supportato, e ognuno sa parlare la lingua di quel fornitore. Serve perché Claude e Codex **non comunicano allo stesso modo**: uno usa un formato a flusso, l'altro un protocollo a chiamate remote. Invece di costringere l'interfaccia a capire entrambi, il server **traduce tutto in un formato unico** appena arriva. È il pezzo tecnicamente più interessante: aggiungere un fornitore nuovo non richiede riscrivere l'app, basta **un file**.
+2. **Il bus degli eventi**, che smista quel flusso normalizzato, e lo **scrive su disco** conversazione per conversazione: niente va perso.
+3. **Il broker dei permessi**: intercetta le azioni rischiose — comandi di shell, modifiche di file — e le trasforma in **carte di approvazione** prima che succeda qualcosa. Sta sul server, non nell'app, così la logica è una sola per tutti i bot e tutti i fornitori.
+
+Tutto gira **sulla tua macchina**: il server ascolta su `127.0.0.1` e i dati — trascrizioni, chiavi, registri — stanno in una cartella nascosta del tuo computer, non su un cloud.
+
+## Le tre cose che fa meglio
+
+1. **I permessi.** Ogni azione rischiosa diventa una carta con *approva* e *nega* **dentro la chat**. Non è un'impostazione sepolta: è il modo normale di lavorare. È l'opposto dell'agente che si fida e va avanti.
+2. **I bot si parlano.** Puoi metterne uno come capo e gli altri come specialisti — posta, spese, reclutamento, correzioni — e si scambiano contesto **da soli**, in chat di gruppo, senza che tu faccia da tramite.
+3. **Vedere il lavoro.** Ogni bot può avere un computer con **anteprima dal vivo**: guardi cosa sta facendo mentre lo fa, invece di leggere un riassunto dopo.
+
+## Le cose che gli mancano, rispetto a Hermes
+
+1. **Non ricorda fra le sessioni.** La memoria è del singolo filo di conversazione. Hermes ha una memoria che sopravvive ai riavvii.
+2. **Non impara.** Non c'è un posto dove mettere una procedura scoperta una volta. Hermes scrive **skill**.
+3. **È un'app da scrivania.** Non sta su un server come servizio con i suoi bot. Hermes sì.
+
+## Cosa ci fai, in concreto
+
+Tre esempi, che sono i casi per cui è stato pensato.
+
+**Il riassunto della posta, ogni mattina alle nove.** Dici al bot, in chat: *«ogni giorno feriale alle 9, mandami un riassunto della posta»*. Lui imposta l'orario da sé e da quel momento lavora anche a computer spento. La mattina trovi il riassunto. Se un giorno non ti serve, dalla carta nella chat lo metti in pausa.
+
+**La bozza di risposta, quando arriva la mail giusta.** *«Quando arriva una mail da un certo cliente, prepara una bozza di risposta.»* Il bot collega l'evento e da quel momento la bozza è pronta prima che tu apra la posta. **Tu la leggi e la mandi**: il bot non spedisce niente da solo.
+
+**La squadra con un capo.** Metti un bot come capo e sotto di lui tre specialisti — posta, spese, correzioni di codice. Il capo riceve la richiesta e la smista: *«questa è roba di spese»*. Gli specialisti si scambiano il contesto **fra loro**, in una chat di gruppo che puoi leggere. Tu intervieni solo quando uno chiede un permesso.
+
+**E il controllo, quando serve.** Un bot sta lavorando su un sito: apri il suo desktop e lo **guardi muoversi** in tempo reale — dove clicca, cosa scrive, dove si blocca. Non è un riassunto di quello che ha fatto: è quello che sta facendo.
+
+## Lo stato, verificato oggi
+
+I numeri che girano nei video **invecchiano in fretta**, e questo è un esempio perfetto: un video recente parlava di «oltre mille stelle su GitHub» e di «solo per Mac». **Nessuna delle due cose è più vera.**
+
+| | diceva il video | **oggi (verificato)** |
+|---|---|---|
+| Stelle su GitHub | «oltre 1.000» | **5.574** |
+| Piattaforme | «solo macOS» | **macOS (due versioni: Apple silicon e Intel), Windows, Ubuntu 24.04** |
+| Attività programmate | «segnaposto, non funzionano» | **funzionanti**: orari, webhook, eventi delle app |
+| Programmi supportati | Claude e Codex | **Claude, Codex e Grok** |
+| Versione | — | in sviluppo attivo, ultimo aggiornamento **oggi** |
+
+**Le cose da sapere prima di provarlo**: lo stato dichiarato dagli autori è *«presto, ma vero»* — il giro completo funziona (messaggio → agente → risposta → strumenti → approvazioni → uso del computer), ma **Ubuntu è in prova**, la connettività da telefono è ancora in costruzione, e i webhook usano un ricevitore locale invece di un servizio sempre acceso. La versione per Windows esiste, ma le capacità avanzate — controllo del computer, dettatura — sono documentate per macOS e Ubuntu, non per Windows.
+
+> **La lezione, che vale oltre questo caso**: i video invecchiano in settimane. Un progetto giovane cambia piattaforme, funzioni e numeri a un ritmo che nessuna trascrizione può seguire. **Prima di decidere, si guarda il repository**, non il video che ne parlava.
+
+---
+
+# 17 · Pi: l'agente che ha deciso di non avere quasi niente
+
+E qui il confronto con Hermes è ancora più netto, perché **Pi è l'esatto opposto**: è un harness agentico **minimale**, e la sua unica ambizione è fare il minimo indispensabile.
+
+| | **Hermes** | **Pi** |
+|---|---|---|
+| Che cos'è | agente completo, con harness proprio | **harness minimale**: il giro e quattro strumenti |
+| Strumenti | decine: browser, voce, subagenti, lavori programmati | **quattro**: leggi, esegui, modifica, scrivi |
+| Istruzioni di sistema | ampie (personalità, regole, procedure) | **poche righe** |
+| Memoria | persistente fra le sessioni | **nessuna**: solo la sessione in corso |
+| Skill | **1.428 file** | supporta i file di istruzioni, ma non ne porta |
+| Permessi | delegati al modello | **nessuno: parte senza chiedere** |
+| Connettori MCP | 55 | **non li supporta** |
+| Subagenti | sì | **no** (se serve, lancia se stesso da riga di comando) |
+| Lavori in sottofondo | sì | **no**: i comandi sono sincroni |
+| Interfaccia | desktop, riga di comando, gateway | **terminale** (con interfacce grafiche della comunità) |
+
+## Cosa fa, esattamente
+
+Pi è un **assistente di programmazione da terminale**. È scritto da **Mario Zechner**, è libero (licenza MIT), e nasce da una frustrazione dichiarata senza giri di parole: gli strumenti che usava erano diventati *«un'astronave con l'80% di funzioni che non mi servono»*, e le loro istruzioni di sistema cambiavano a ogni versione, rompendo i flussi di lavoro.
+
+La sua filosofia sta in una riga: **«se non mi serve, non lo costruisco»**. E la lista di quello che **non** ha è la cosa più interessante del progetto, perché ogni assenza è una **decisione**, non una mancanza.
+
+## Quello che non c'è, e perché
+
+- **Niente elenchi di cose da fare.** L'agente non tiene una lista di attività: se serve, se la scrive in un file.
+- **Niente modalità «pianifica prima».** Non c'è un passo separato in cui l'agente progetta e tu approvi: si lavora.
+- **Niente connettori MCP.** Un intero standard di integrazione, escluso. Se serve uno strumento, si usa la riga di comando.
+- **Niente comandi in sottofondo.** I comandi girano **sincroni**: non puoi avviare un server e continuare a parlarci. La motivazione dell'autore è che gestire processi in sottofondo porta complicazioni — seguire i processi, raccoglierne l'output, pulirli all'uscita — e che gli strumenti che lo fanno hanno **scarsa visibilità** su cosa sta girando.
+- **Niente subagenti.** Non esiste uno strumento per generare un agente figlio. L'autore è esplicito: quando un altro agente ne genera uno, **tu non vedi niente** di quello che fa — «una scatola nera dentro una scatola nera» — e se sbaglia, capire perché è doloroso. Se ti serve, chiedi a Pi di **lanciare se stesso** da riga di comando, magari dentro una sessione di terminale che puoi guardare.
+- **Niente permessi.** Pi parte **senza chiedere conferma**: gli strumenti girano con i privilegi dell'utente che l'ha avviato. È una scelta dichiarata, ed è la ragione per cui — se lo si usa da interfaccia grafica — va tenuto **solo su indirizzo locale**: quella è la rete di sicurezza, e vale la pena dirla invece di lasciarla intuire.
+
+## Quattro strumenti e poche righe di istruzioni
+
+Tutto quello che Pi sa fare sta in **quattro strumenti**: leggere un file, eseguire un comando, modificare un file, scriverne uno nuovo. Le istruzioni di sistema sono poche righe: *«sei un assistente esperto; hai questi quattro strumenti; usa la riga di comando per le operazioni sui file; leggi prima di modificare; sii conciso»*. Fine.
+
+Il vantaggio dichiarato è la **sobrietà**: poche istruzioni significano **meno gettoni spesi** e un comportamento più prevedibile. Ed è la stessa ragione per cui l'autore rivendica di poter **controllare davvero il contesto** — cioè cosa finisce sotto gli occhi del modello — cosa che gli altri strumenti rendono difficile iniettando roba che non si vede.
+
+## Cosa ci fai, in concreto
+
+Quattro esempi, tutti di lavoro vero.
+
+**Rinominare duecento file.** *«In questa cartella rinomina tutti i file da `foto-1.jpg` a `vacanza-2026-01.jpg` in ordine di data.»* Un comando, il controllo che siano tutti lì, fatto. Con quattro strumenti basta: leggere l'elenco, eseguire, verificare.
+
+**Sostituire una funzione in un file.** *«In questo file la funzione `calcola` usa ancora il vecchio formato: aggiornala e controlla chi la chiama.»* Legge, modifica, cerca i richiami, ti dice cosa ha toccato. Nessuna cerimonia.
+
+**Cercare dove si usa una cosa.** *«In tutti i file di questo progetto, dove viene usata questa variabile?»* Un comando di ricerca, il risultato, e la decisione è tua.
+
+**Spiegare un errore.** *«Esegui il test e dimmi perché fallisce.»* Esegue, legge l'errore, apre i file che servono, ti spiega. Se la correzione è ovvia, la fa; se no, te la propone.
+
+**E cosa *non* gli chiedi.** *«Ricordati che il cliente preferisce le mail brevi»*: non se lo ricorda, non ha memoria fra le sessioni. *«Metti in piedi un servizio che sorvegli una cartella e mi avvisi»*: non lo fa, i comandi sono sincroni e non ci sono lavori programmati. *«Chiedimi il permesso prima di cancellare»*: non chiede, parte e basta. Per queste tre cose serve un altro agente — ed è esattamente il confine con Hermes.
+
+## Quando ha senso, e quando no
+
+**Ha senso** se sai cosa stai facendo: se ti serve un assistente che legga, modifichi ed esegua, senza cerimonie, e vuoi vedere esattamente cosa gli passi. Costa poco in gettoni e non ti obbliga a imparare un sistema.
+
+**Non ha senso** se ti serve un agente che **ricordi**, che **impari procedure**, che **giri su un server**, che **chieda permesso** prima di toccare qualcosa o che **coordini altri agenti**. Per questo esiste Hermes: sono due risposte opposte alla stessa domanda.
+
+**E il paradosso utile**: Pi dimostra che **un harness grande non è obbligatorio**. Un agente che sa fare quattro cose può essere più utile di uno che ne sa fare cento — se le quattro sono quelle giuste e le cento ti confondono.
+
+---
+
 # Come si combinano: una filiera completa
 
 Mettiamo insieme i pezzi, in un caso reale: **un tutorial che mostra come si usa un'applicazione**.
@@ -702,3 +846,5 @@ Misurato su un caso reale: lo stesso percorso passa da oltre tre minuti a venti 
 4. **La base è ffmpeg.** Se impari quello, gli altri strumenti diventano interfacce comode attorno a qualcosa che sai già fare — e puoi cambiarli senza ricominciare da capo.
 5. **Mai un vicolo cieco.** Vale per il software e vale per chi lo scrive: ogni errore deve indicare una strada, non solo un muro.
 6. **La credenziale resta a chi appartiene.** L'automatismo riceve un permesso, non una password. E il permesso si può togliere.
+7. **Verifica l'aggiornamento, e cerca quello che manca.** Le informazioni su questi strumenti **invecchiano in settimane**: un video, un articolo o un appunto di tre mesi fa può descrivere un programma che nel frattempo ha cambiato piattaforme, prezzi, funzioni e perfino nome. Prima di decidere — e prima di scrivere — si guarda la **fonte ufficiale** (il repository, il catalogo dei modelli, la pagina del progetto) e si controlla: **cosa è cambiato**, e **cosa c'è di nuovo che prima non c'era**.
+8. **La fonte ufficiale batte il racconto.** Vale per i numeri (le stelle di un progetto, il prezzo di un modello, le piattaforme supportate) e vale per le promesse: quando la pagina di presentazione e la documentazione tecnica non dicono la stessa cosa, **ha ragione la documentazione**. Le due cose non coincidono quasi mai per caso.
