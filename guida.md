@@ -714,13 +714,16 @@ Tre esempi, che sono i casi per cui è stato pensato.
 
 I numeri che girano nei video **invecchiano in fretta**, e questo è un esempio perfetto: un video recente parlava di «oltre mille stelle su GitHub» e di «solo per Mac». **Nessuna delle due cose è più vera.**
 
-| | diceva il video | **oggi (verificato)** |
+| | diceva il video | **al 28 ottobre 2026** |
 |---|---|---|
-| Stelle su GitHub | «oltre 1.000» | **5.574** |
+| Stelle su GitHub | «oltre 1.000» | **5.769** (dalla fonte ufficiale: `milind-soni/OpenMausBot`) |
 | Piattaforme | «solo macOS» | **macOS (due versioni: Apple silicon e Intel), Windows, Ubuntu 24.04** |
 | Attività programmate | «segnaposto, non funzionano» | **funzionanti**: orari, webhook, eventi delle app |
 | Programmi supportati | Claude e Codex | **Claude, Codex e Grok** |
-| Versione | — | in sviluppo attivo, ultimo aggiornamento **oggi** |
+| Versione | — | **v0.1.130** (27 ottobre), ultimo aggiornamento **28 ottobre** |
+| Fork · questioni aperte | — | 972 fork · 487 questioni aperte |
+
+**Perché la cifra è datata.** Il progetto **si muove in fretta**: in due giorni ha guadagnato 144 stelle e ha pubblicato tre versioni. Una pagina di terze parti consultata il 26 ottobre ne dichiarava 5.625, e il 28 erano già 5.769. I numeri si prendono **dalla fonte ufficiale** (l'API del repository) e si **datano** quando si scrivono: una cifra senza data è una cifra che sta già invecchiando.
 
 **Le cose da sapere prima di provarlo**: lo stato dichiarato dagli autori è *«presto, ma vero»* — il giro completo funziona (messaggio → agente → risposta → strumenti → approvazioni → uso del computer), ma **Ubuntu è in prova**, la connettività da telefono è ancora in costruzione, e i webhook usano un ricevitore locale invece di un servizio sempre acceso. La versione per Windows esiste, ma le capacità avanzate — controllo del computer, dettatura — sono documentate per macOS e Ubuntu, non per Windows.
 
