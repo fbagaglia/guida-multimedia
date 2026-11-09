@@ -2,7 +2,7 @@
 
 Il multimedia si può fare senza abbonamenti. Non è una promessa da volantino: è che negli ultimi anni gli strumenti **aperti** hanno raggiunto quelli commerciali, e in alcuni casi li hanno superati — perché chi costruisce un prodotto chiuso deve proteggere il proprio margine, mentre chi costruisce uno strumento aperto può permettersi di essere usato da chiunque, ovunque, senza chiedere il conto.
 
-Questa guida mette in fila otto strumenti e **una tecnica**. Gli strumenti si scelgono in base a cosa devi fare; la tecnica, invece, cambia il modo in cui lavori, ed è per questo che le ho dato il capitolo più lungo.
+Questa guida mette in fila undici strumenti e **una tecnica**. Gli strumenti si scelgono in base a cosa devi fare; la tecnica, invece, cambia il modo in cui lavori, ed è per questo che ha un capitolo a sé.
 
 > Il criterio con cui ho scritto: per ogni strumento dico **cosa fa**, **quanto costa davvero** e **cosa serve per usarlo**. Dove un prodotto è a pagamento lo dico apertamente: non serve a nessuno un elenco che promette gratuità e poi chiede la carta di credito al primo salvataggio.
 
@@ -138,7 +138,7 @@ Le due accortezze, entrambe imparate sbagliando:
 
 Playwright si presenta ai siti come **browser automatizzato**, e alcuni servizi — Google in testa — rispondono *«questo browser potrebbe non essere sicuro»* **prima ancora di chiedere le credenziali**. Non è un blocco sulla password: non c'è nessun campo dove digitarla.
 
-La soluzione esiste, ed è il capitolo 11. Qui basti sapere che il problema non è la password.
+La soluzione esiste, ed è il capitolo 12. Qui basti sapere che il problema non è la password.
 
 ---
 
@@ -278,9 +278,80 @@ Il cloud parte con **cinque esecuzioni gratuite** su schede grafiche vere e un p
 - La versione locale **parte anche senza scheda grafica**, usando solo il processore. È supportato ufficialmente. Ma su una macchina come questa (un i5 senza GPU dedicata) i tempi diventano **inutilizzabili**: si parla di ore per un'immagine, non di minuti.
 - Quindi: "serve una GPU" è vero **per le prestazioni**, non in assoluto. Chi non ce l'ha e vuole usare ComfyUI davvero, oggi sceglie il cloud.
 
+> Il rovescio di questa medaglia è il capitolo 9: là l'intelligenza artificiale non **genera** le immagini, **scrive il programma che le disegna**. Un altro mestiere, con in cambio un controllo che qui manca.
+
 ---
 
-# 9 · AnyMP4 / AnyRec: conversione e montaggio
+# 9 · Il video che è tutto codice: Lemo-Opuscar
+
+Il capitolo precedente finisce con un modello che **genera** le immagini. Questo comincia dalla parte opposta, e la distinzione è il cuore di tutta la guida.
+
+Un conto è chiedere a un'intelligenza artificiale di **inventare e generare** un video; un altro è chiederle di **scrivere il programma che lo costruisce**. Il risultato, in mano allo spettatore, può somigliarsi. Il processo no: sono due mestieri diversi, e la differenza si sente nel momento in cui vuoi cambiare qualcosa.
+
+## Due modi di fare un video
+
+**Col metodo generativo** si descrive la scena — «un robot che cammina in una città futuristica sotto la pioggia, con luce da film» — e un modello addestrato su grandi quantità di filmati produce i fotogrammi, il movimento, le luci, gli effetti. È come avere una troupe al completo: regista, direttore della fotografia, attrezzisti. Il vantaggio è l'impatto: cose realistiche e scenografiche con poche parole. Il limite è il controllo: se vuoi spostare un oggetto di quindici pixel, o correggere una scritta senza toccare il resto, ti muovi nel vago. Rilanci e speri, e ogni nuova versione è **un'altra versione** — non la stessa con una virgola diversa.
+
+**Col metodo programmatico** non si chiede il video: si chiede **il programma che lo disegna**. L'agente sceglie la sequenza delle scene, scrive il codice che traccia testi, forme, diagrammi e collegamenti, definisce animazioni, colori e tempi, e poi un motore grafico renderizza i fotogrammi, che vengono cuciti in un file video. Qui ogni elemento è **definito matematicamente**: è una coordinata, un colore, una durata. E proprio per questo si può cambiare.
+
+> La differenza, in una riga: nel primo caso l'intelligenza artificiale **immagina** il video; nel secondo **costruisce la macchina che lo produce**. E nel secondo, cambiare una cosa è cambiare una riga e rilanciare, con tutto il resto che resta identico a prima.
+
+## Una precisazione che evita confusione
+
+Attenzione a non mettere sullo stesso piano cose diverse. **Canvas, WebGL e SVG non sono modelli di intelligenza artificiale** e non generano video da soli: sono **tecnologie di disegno** — il foglio e la matita. Il video lo fa il codice che le usa.
+
+| Tecnologia | Cos'è | A cosa serve |
+|---|---|---|
+| **Canvas 2D** | il foglio da disegno del browser, guidato da JavaScript | testi, forme, grafici, animazioni piatte: infografiche animate, spiegazioni didattiche |
+| **WebGL** (con three.js) | il motore grafico che sfrutta la scheda grafica | oggetti tridimensionali, particelle, simulazioni, ambienti |
+| **SVG** | disegno vettoriale, ingrandibile senza perdita di qualità | diagrammi, icone, mappe, schemi |
+| **Remotion** | un sistema che organizza un intero video scrivendolo come una pagina web | video didattici e presentazioni costruite a codice |
+
+Il chiarimento: le prime tre sono **come si disegna**; Remotion è **come si organizza un film** — scene, tempi, sincronizzazione — e sta un gradino più su.
+
+## Lemo-Opuscar: una libreria di stili, fatta di codice
+
+Il metodo programmatico ha un esempio concreto, ed è la cosa che ho installato su questa macchina. **Lemo-Opuscar** è una libreria di **66 stili cinematografici per agenti**: non 66 filtri da applicare a un video, ma 66 **modi di girare**.
+
+Ogni stile è un file di testo, `STYLE.md`, che fissa le **invarianti**: che aspetto ha, di quali materiali è fatto, che logica usa per il colore, che tipografia, che qualità di movimento, che grammatica di camera, che suono. Accanto al testo c'è una **demo costruita interamente in codice** — Canvas 2D, three.js, shader WebGL2 — che serve a mostrare quello stile in azione e a farne imparare la tecnica. Il testo da una parte, il film che lo prova dall'altra.
+
+E qui arriva il punto, perché è lo stesso di tutto il capitolo:
+
+> **Nessun modello video.** Il film è `window.render(t)`: una pagina che sa disegnare se stessa all'istante `t`. Il render apre Chrome senza finestra, chiede i fotogrammi uno per uno e li cuce; l'audio è sintetizzato in casa e aggiunto con `ffmpeg`. Non c'è niente da addestrare e niente da generare: c'è codice che gira.
+
+**In pratica, come funziona la filiera** (è una filiera, non un singolo programma):
+
+1. **si sceglie lo stile** e si scrive la sceneggiatura — la libreria la chiama *treatment*: cosa si vede, in che ordine, per quanto;
+2. **si compone la linea del tempo unica** delle scene;
+3. **si genera la voce** (voce sintetica, poi controllata da un riconoscitore che verifica che il parlato si dica davvero);
+4. **si compone la musica** con librerie di campioni e sintesi, non con brani di terzi;
+5. **si renderizza la parte visiva**: un browser per processo, i fotogrammi catturati e montati;
+6. **si mixa e si cuce** tutto con `ffmpeg`.
+
+Il bello è che **non serve una scheda grafica vera**: gira su questo portatile, con la grafica integrata, usando WebGL2; e se un effetto non regge c'è un ripiego in solo software, più lento ma affidabile. Per la parte vocale serve una sola accortezza: quel modulo è installato su un **Python 3.12 dedicato**, non su quello di sistema.
+
+## Dove sta, nel quadro
+
+Lemo-Opuscar è **aperta** (il codice con licenza MIT, le demo con CC BY 4.0: si possono usare citando la fonte) e vive su un repository pubblico. È nata come **plugin di Claude Code** — uno di quei pacchetti che si agganciano all'agente per dargli una capacità in più — e io l'ho resa una **skill di Hermes**: è esattamente il meccanismo del capitolo 13, una procedura scritta una volta che l'agente carica quando serve.
+
+Mettendo i tre modi di fare un video uno accanto all'altro, il quadro si chiude:
+
+| | IA generativa | Programmatico (codice) | Montaggio tradizionale |
+|---|---|---|---|
+| come nasce | il modello genera il video | il codice disegna i fotogrammi | si montano materiali già girati |
+| controllo | indiretto, «per prompt» | **molto preciso** | manuale, a vista |
+| realismo | elevato di suo | dipende da cosa disegni | dipende da cosa hai girato |
+| testi e grafici | variabile | **molto preciso** | molto preciso |
+| come si modifica | si riscrive il prompt | si cambia il codice | si sposta sulla linea del tempo |
+| automazione | alta | **altissima** | variabile |
+
+E l'ultima proprietà è quella che vale per la didattica: siccome il video è codice, **il video è parametrico**. Si scrive **un** modello di film e se ne generano cento — cambiano argomento, dati, lingua, immagini e testi, mentre l'impianto resta lo stesso. Col metodo generativo questo non si fa: lì ogni video è un esemplare unico.
+
+> Non è una gara fra i tre metodi: si combinano. Le scene cinematografiche dove servono, i grafici e gli schemi fatti a codice dove serve la precisione, il montaggio a chiudere il tutto. La filiera del capitolo «Come si combinano» è esattamente questo, e un video di formazione serio li usa tutti e tre.
+
+---
+
+# 10 · AnyMP4 / AnyRec: conversione e montaggio
 
 Sono programmi con l'interfaccia grafica per convertire video, registrarne lo schermo, scaricare da internet, montare. Fanno il loro lavoro, e a molti risultano più comodi di una riga di comando.
 
@@ -308,7 +379,7 @@ Quando un programma gratuito chiede di pagare, guarda **cosa** ti sta vendendo:
 
 ---
 
-# 10 · Pollinations: contenuti generati via API
+# 11 · Pollinations: contenuti generati via API
 
 Pollinations è un servizio che genera **immagini, testo, audio e video** con un'interfaccia molto semplice: spesso basta un indirizzo web. È la via più diretta per aggiungere un'immagine o una voce a un progetto senza installare nulla.
 
@@ -334,7 +405,7 @@ Il vantaggio è che **la credenziale non passa mai da chi la deve usare**: nessu
 
 ---
 
-# 11 · La tecnica: far entrare un agente nei propri profili
+# 12 · La tecnica: far entrare un agente nei propri profili
 
 Questo è il capitolo per cui vale la pena leggere la guida, perché cambia il modo di lavorare più di qualunque strumento dell'elenco.
 
@@ -390,7 +461,7 @@ Un errore che dice soltanto "non posso" fa perdere tempo a chi lo legge, e fa se
 
 ---
 
-# 12 · Le skill: procedure scritte una volta
+# 13 · Le skill: procedure scritte una volta
 
 Fin qui la guida ha parlato di **strumenti**: cose che si installano e si usano. Quest'ultima parte parla di un'altra cosa, che non si scarica e non si paga: il **modo di lavorare**.
 
@@ -422,7 +493,7 @@ Queste sono le vitali in questa installazione, con il criterio: **quelle che cam
 
 ---
 
-# 13 · I connettori: dare le mani all'agente
+# 14 · I connettori: dare le mani all'agente
 
 Saper scrivere non basta: per agire in un servizio esterno — leggere la posta, creare un evento, aprire un progetto — l'agente ha bisogno di un **connettore**.
 
@@ -448,13 +519,13 @@ In questa installazione sono abilitati **55 connettori**.
 
 ## La regola che conta
 
-**Se ne connette uno quando serve, non tutti insieme.** Ogni connettore è un permesso in più, e i permessi si danno uno alla volta, quando il lavoro li richiede. È la stessa logica dell'accesso delegato del capitolo 11: chi ha le credenziali le tiene, chi deve usarle riceve **solo il permesso che gli serve** — e il permesso si può togliere.
+**Se ne connette uno quando serve, non tutti insieme.** Ogni connettore è un permesso in più, e i permessi si danno uno alla volta, quando il lavoro li richiede. È la stessa logica dell'accesso delegato del capitolo 12: chi ha le credenziali le tiene, chi deve usarle riceve **solo il permesso che gli serve** — e il permesso si può togliere.
 
 ---
 
 ---
 
-# 14 · I progetti
+# 15 · I progetti
 
 Questa parte non parla di strumenti ma di **cose costruite**: i repository e i cantieri che stanno su questa macchina. Serve a due scopi — avere un indice di cosa c'è, e capire **come** questi strumenti sono stati usati insieme.
 
@@ -587,7 +658,7 @@ Tre cose, che valgono più di un elenco.
 
 ---
 
-# 15 · Portare tutto su un altro computer
+# 16 · Portare tutto su un altro computer
 
 Un'ultima cosa, che non è multimedia ma è la domanda che viene subito dopo: **se cambio computer, cosa mi porto dietro?**
 
@@ -648,7 +719,7 @@ Portarsi dietro millequattrocento skill non serve perché sono tante, ma perché
 
 ---
 
-# 16 · OpenMausBot: mettere in fila gli agenti che già paghi
+# 17 · OpenMausBot: mettere in fila gli agenti che già paghi
 
 Prima di raccontarlo, la differenza che conta — perché è la stessa domanda che si fa chi usa questa guida.
 
@@ -731,7 +802,7 @@ I numeri che girano nei video **invecchiano in fretta**, e questo è un esempio 
 
 ---
 
-# 17 · Pi: l'agente che ha deciso di non avere quasi niente
+# 18 · Pi: l'agente che ha deciso di non avere quasi niente
 
 E qui il confronto con Hermes è ancora più netto, perché **Pi è l'esatto opposto**: è un harness agentico **minimale**, e la sua unica ambizione è fare il minimo indispensabile.
 
@@ -848,11 +919,11 @@ E c'è una terza via: Pi ha **quattro modalità** — interattiva, a stampa, **a
 Mettiamo insieme i pezzi, in un caso reale: **un tutorial che mostra come si usa un'applicazione**.
 
 1. **Si decide cosa mostrare.** Una descrizione scritta di quello che il video deve far vedere. È il testo che guiderà tutto il resto.
-2. **L'automatismo entra nel servizio** (capitolo 11): finestra propria, accesso fatto dalla persona, sessione salvata.
+2. **L'automatismo entra nel servizio** (capitolo 12): finestra propria, accesso fatto dalla persona, sessione salvata.
 3. **Si legge l'interfaccia** con Playwright (capitolo 3): quali elementi ci sono, dove sono, cosa dicono.
 4. **Si decide, un passo alla volta, cosa mostrare** — e qui sta l'accorgimento che fa la differenza: non si pianifica tutto in anticipo, perché dopo il primo clic la schermata cambia. Si procede **una tappa alla volta**, rileggendo la pagina dove si è arrivati.
 5. **Si registra con ffmpeg** (capitolo 1), non con lo screencast: così si vede il puntatore vero.
-6. **Si scrivono le didascalie e si genera la voce** (capitolo 10) per ogni tappa.
+6. **Si scrivono le didascalie e si genera la voce** (capitolo 11) per ogni tappa.
 7. **Si monta tutto** con ffmpeg: le dissolvenze fra le scene, la musica di sfondo, l'abbassamento automatico della musica quando la voce parla.
 8. **Si esporta** nel formato di destinazione — 1920×1080 per una piattaforma didattica, verticale per i social.
 
@@ -882,6 +953,7 @@ Misurato su un caso reale: lo stesso percorso passa da oltre tre minuti a venti 
 | Oggetti 3D | **Meshy** | 100 crediti/mese, 10 scarichi | gratis: CC BY 4.0 (citare) · a pagamento: senza attribuzione |
 | Immagini e video generati in locale | **ComfyUI** | **sì** | aperta (GPL-3.0) — ma serve una GPU vera |
 | Immagini e video generati nel cloud | **Comfy Cloud** | 5 prove, poi da ~20 $/mese | commerciale |
+| Video fatti interamente di codice | **Lemo-Opuscar** | **sì** | aperta (MIT; demo CC BY 4.0, citare) |
 | Registrare lo schermo dal browser, senza installare | **AnyMP4 online** | **sì, senza filigrana** | commerciale (max 24 fps) |
 | Registrare lo schermo dal browser (con filigrana) | **AnyRec online** | sì | commerciale |
 | Conversione e montaggio con i pulsanti | **AnyMP4 / AnyRec desktop** | prova con limiti | a pagamento (~12-15 $/mese) |

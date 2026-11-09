@@ -1,6 +1,6 @@
 # Creare video e contenuti multimediali senza strumenti a pagamento
 
-Guida pratica, passo per passo: **dieci strumenti gratuiti**, **una tecnica** e l'**indice dei
+Guida pratica, passo per passo: **undici strumenti gratuiti**, **una tecnica** e l'**indice dei
 progetti**, con i dati verificati sulle fonti ufficiali. Alla base di tutto c'è `ffmpeg`.
 
 ## I capitoli
@@ -15,13 +15,16 @@ progetti**, con i dati verificati sulle fonti ufficiali. Alla base di tutto c'è
 | 6 | **GSAP** — animazione per il video | sì, anche per lavoro, ma licenza **proprietaria** |
 | 7 | **Meshy** — oggetti 3D | 100 crediti/mese; gratis con **CC BY 4.0** (citare) |
 | 8 | **ComfyUI / Comfy Cloud** — immagini e video generati | locale sì (serve GPU), cloud da ~20 $/mese |
-| 9 | **AnyMP4 / AnyRec** — conversione e montaggio | desktop a pagamento; registratore **online** gratuito |
-| 10 | **Pollinations** — contenuti via API | immagini senza chiave; testo solo sull'indirizzo semplice |
-| 11 | **La tecnica: l'accesso delegato** — far entrare un agente nei propri profili **senza dargli la password** | tecnica, non prodotto |
-| 12 | **Le skill** — procedure scritte una volta | — |
-| 13 | **I connettori MCP** — dare le mani all'agente | 55 abilitati |
-| 14 | **I progetti** — i repository e i cantieri, con la spiegazione di ciascuno | — |
-| 15 | **Portare tutto su un altro computer** — cosa salvare e cosa no | — |
+| 9 | **Lemo-Opuscar** — il video fatto interamente di codice (66 stili) | sì, open source (MIT; demo CC BY 4.0) |
+| 10 | **AnyMP4 / AnyRec** — conversione e montaggio | desktop a pagamento; registratore **online** gratuito |
+| 11 | **Pollinations** — contenuti via API | immagini senza chiave; testo solo sull'indirizzo semplice |
+| 12 | **La tecnica: l'accesso delegato** — far entrare un agente nei propri profili **senza dargli la password** | tecnica, non prodotto |
+| 13 | **Le skill** — procedure scritte una volta | — |
+| 14 | **I connettori MCP** — dare le mani all'agente | 55 abilitati |
+| 15 | **I progetti** — i repository e i cantieri, con la spiegazione di ciascuno | — |
+| 16 | **Portare tutto su un altro computer** — cosa salvare e cosa no | — |
+| 17 | **OpenMausBot** — mettere in fila gli agenti che già paghi | il programma è gratuito; gli agenti che usa si pagano a parte |
+| 18 | **Pi** — l'agente minimale, che si estende con poco | sì, open source |
 
 ## File
 

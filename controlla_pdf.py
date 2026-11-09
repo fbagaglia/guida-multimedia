@@ -24,7 +24,8 @@ for parola in ("e contenuti m\nultimediali", "ontenuti m\n"):
     print("   parola spezzata %-12r: %s" % (parola, "PRESENTE (difetto)" if parola in tutto else "assente ✓"))
 
 # 2) le sezioni ci sono tutte, in ordine
-attese = ["FFmpeg", "Recordly", "Playwright", "GSAP", "Meshy", "Comfy", "AnyMP4", "Pollinations",
+attese = ["FFmpeg", "Recordly", "Playwright", "GSAP", "Meshy", "Comfy", "Lemo-Opuscar",
+          "video fatto interamente di codice", "window.render", "AnyMP4", "Pollinations",
           "accesso delegato", "vicolo cieco",
           "HyperFrames", "node_modules", "Le skill", "local-first-webapp-stdlib",
           "connettori", "Canva", "Composio", "Gmail", "MCP",
